@@ -1,0 +1,17 @@
+.{
+    .name = .pill,
+    .version = "0.0.0",
+    .dependencies = .{
+        .tz = .{
+            .url = "https://github.com/ocfox/tz/archive/master.tar.gz",
+            .hash = "tz-0.0.3-zO1cc0PoCADqao27vz-i6v0qAk1wBF8E0OzwuYaTcxhF",
+        },
+    },
+    .fingerprint = 0x803186f7ee107c54,
+    .minimum_zig_version = "0.16.0",
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
