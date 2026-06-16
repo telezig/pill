@@ -20,6 +20,8 @@ const media = @import("cmd/media.zig");
 const moderation = @import("cmd/moderation.zig");
 const inline_mode = @import("cmd/inline_mode.zig");
 const convo = @import("cmd/convo.zig");
+const rich = @import("cmd/rich.zig");
+const join = @import("cmd/join.zig");
 
 /// Set in main() from the OWNER_ID env var. null = respond to everyone.
 var owner_id: ?i64 = null;
@@ -59,6 +61,7 @@ fn onMessage(ctx: tz.Context, update: tg.UpdateNewMessage) !void {
     if (msg.is("/edit")) return messaging.onEdit(msg);
     if (msg.is("/typing")) return messaging.onTyping(msg);
     // media
+    if (msg.is("/photo")) return media.onPhoto(msg);
     if (msg.is("/document")) return media.onDocument(msg);
     if (msg.is("/testalbum")) return media.onTestAlbum(msg);
     if (msg.is("/testexternal")) return media.onTestExternal(msg);
@@ -73,6 +76,10 @@ fn onMessage(ctx: tz.Context, update: tg.UpdateNewMessage) !void {
     if (msg.is("/forward")) return moderation.onForward(msg);
     // conversation
     if (msg.is("/ask")) return convo.onAsk(msg);
+    // rich messages (layer 227)
+    if (msg.is("/richmd")) return rich.onRichMd(msg);
+    if (msg.is("/richhtml")) return rich.onRichHtml(msg);
+    if (msg.is("/richstream")) return rich.onRichStream(msg);
 
     // No command matched: if it's media, echo it back as a file.
     try media.onIncomingMedia(msg);
@@ -86,6 +93,10 @@ fn onInline(ctx: tz.Context, update: tg.UpdateBotInlineQuery) !void {
     return inline_mode.onInline(ctx, update);
 }
 
+fn onJoinRequest(ctx: tz.Context, update: tg.UpdateBotChatInviteRequester) !void {
+    return join.onJoinRequest(ctx, update);
+}
+
 /// The comptime handler table — one entry per update type we care about. The
 /// Client dispatches each incoming update to the matching handler with zero
 /// runtime lookup.
@@ -93,6 +104,7 @@ const handlers = &.{
     tz.handler(tg.UpdateNewMessage, onMessage),
     tz.handler(tg.UpdateBotCallbackQuery, onCallback),
     tz.handler(tg.UpdateBotInlineQuery, onInline),
+    tz.handler(tg.UpdateBotChatInviteRequester, onJoinRequest),
 };
 
 /// Register the command menu so clients show our commands. Used both as the
@@ -108,6 +120,9 @@ fn registerCommands(ctx: tz.Context) !void {
         .{ .command = "download", .description = "stream an attached file" },
         .{ .command = "ptest", .description = "verify parallel download" },
         .{ .command = "ask", .description = "multi-step conversation" },
+        .{ .command = "richmd", .description = "rich message via markdown (layer 227)" },
+        .{ .command = "richhtml", .description = "rich message via HTML (layer 227)" },
+        .{ .command = "richstream", .description = "streaming rich message draft (layer 227)" },
     };
     try ctx.exec(f.bots.SetBotCommands{
         .scope = .{ .BotCommandScopeDefault = .{} },

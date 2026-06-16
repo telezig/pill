@@ -32,6 +32,7 @@ pub fn onHelp(msg: Msg) !void {
         .{ "/keyboard", "inline keyboard + callbacks" },
         .{ "/edit", "send then edit a message" },
         .{ "/typing", "send typing action" },
+        .{ "/photo", "send a photo from URL" },
         .{ "/document", "send a text file" },
         .{ "/download", "attach a file: stream via File.next()" },
         .{ "/ptest", "verify parallel download vs sequential" },
@@ -44,6 +45,9 @@ pub fn onHelp(msg: Msg) !void {
         .{ "/delete", "delete a message (reply)" },
         .{ "/forward", "forward to this chat (reply)" },
         .{ "/ask", "multi-step conversation" },
+        .{ "/richmd", "rich message via markdown (layer 227)" },
+        .{ "/richhtml", "rich message via HTML (layer 227)" },
+        .{ "/richstream", "streaming rich draft → final message (layer 227)" },
     };
     for (cmds) |cmd| {
         try ft.code(cmd[0]);

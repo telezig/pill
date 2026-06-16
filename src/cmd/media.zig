@@ -96,6 +96,13 @@ fn httpGet(allocator: std.mem.Allocator, io: std.Io, url: []const u8) ![]u8 {
     return aw.toOwnedSlice();
 }
 
+/// /photo — download a photo and send it with a caption.
+pub fn onPhoto(msg: Msg) !void {
+    const bytes = try httpGet(msg.ctx.allocator, msg.ctx.io, "https://s3.s4r.in/aozoraneko");
+    defer msg.ctx.allocator.free(bytes);
+    try h.media.sendPhoto(msg, bytes, .{ .caption = "aozoraneko" });
+}
+
 pub fn onTestAlbum(msg: Msg) !void {
     const bytes1 = try httpGet(msg.ctx.allocator, msg.ctx.io, "https://s3.s4r.in/aozoraneko");
     defer msg.ctx.allocator.free(bytes1);
